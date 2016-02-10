@@ -16,7 +16,7 @@ docker-machine create \
   --swarm --swarm-master \
   --swarm-discovery="consul://$(docker-machine ip mh-kv-vb):8500" \
   --engine-opt="cluster-store=consul://$(docker-machine ip mh-kv-vb):8500" \
-  --engine-opt="cluster-advertise=eth0:2376" \
+  --engine-opt="cluster-advertise=eth1:2376" \
   --engine-label="environment=production" \
   --engine-label="type=frontend" \
   mh-node1-vb
@@ -27,7 +27,7 @@ docker-machine create \
   --swarm \
   --swarm-discovery="consul://$(docker-machine ip mh-kv-vb):8500" \
   --engine-opt="cluster-store=consul://$(docker-machine ip mh-kv-vb):8500" \
-  --engine-opt="cluster-advertise=eth0:2376" \
+  --engine-opt="cluster-advertise=eth1:2376" \
   --engine-label="storage=disk" \
   --engine-label="environment=production" \
   --engine-label="type=frontend" \
@@ -38,7 +38,7 @@ docker-machine create \
   --swarm \
   --swarm-discovery="consul://$(docker-machine ip mh-kv-vb):8500" \
   --engine-opt="cluster-store=consul://$(docker-machine ip mh-kv-vb):8500" \
-  --engine-opt="cluster-advertise=eth0:2376" \
+  --engine-opt="cluster-advertise=eth1:2376" \
   --engine-label="storage=ssd" \
   --engine-label="environment=production" \
   --engine-label="type=backend" \
@@ -47,6 +47,10 @@ docker-machine create \
 # Set environment to Swarm master
 eval $(docker-machine env --swarm mh-node1-vb)
 
-# Create the overlay network
-docker network create -d overlay front-tier
-docker network create -d overlay back-tier
+# Create the overlay networks
+# It is important to define subnets
+# to avoid conflicts and connection issues
+# Or you will spend too much time
+# trying to figure out why it does not work like me :-)
+docker network create -d overlay --subnet=10.0.11.0/24 front-tier
+docker network create -d overlay --subnet=10.0.12.0/24 back-tier

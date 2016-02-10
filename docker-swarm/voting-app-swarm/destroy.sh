@@ -5,3 +5,5 @@ for container in {worker,redis,db,result-app,voting-app}; do
   docker rm $container
 done;
 unset container;
+
+docker volume rm db-data;

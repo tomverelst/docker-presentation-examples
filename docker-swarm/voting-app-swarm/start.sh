@@ -15,10 +15,9 @@ docker run -d \
 # Create Postgres volume
 docker volume create --name db-data
 
-# Start Postgres on a backend node
+# Start Postgres
 docker run -d \
   -v "db-data:/var/lib/postgresql/data" \
-  -p 5432:5432 \
   --net back-tier \
   --restart unless-stopped \
   --name db \
@@ -26,7 +25,7 @@ docker run -d \
   -e "constraint:storage==ssd" \
   postgres:9.4
 
-# Start voting app on frontend node
+# Start voting app
 # You cannot define multiple networks with docker run :-(
 docker create \
  -p 5000:80 \
@@ -35,14 +34,14 @@ docker create \
  -e "constraint:type==frontend" \
 tomverelst/voting-app
 
-# Connect result app to networks
+# Connect result app
 docker network connect front-tier voting-app
 docker network connect back-tier voting-app
 
 # Start voting app
 docker start voting-app
 
-# Create result app on frontend node
+# Create result app
 docker create \
  -p 5001:80 \
  --name result-app \
