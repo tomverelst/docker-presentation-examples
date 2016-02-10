@@ -3,66 +3,53 @@ version: "2"
 services:
   voting-app:
     image: tomverelst/voting-app
-    volumes:
-     - ./voting-app:/app
     ports:
       - "5000:80"
-    #links:
-    #  - redis
     networks:
       - front-tier
       - back-tier
     restart: always
     environment:
-      - "constraint:node==mh-node1-vb"
+      - "constraint:type==frontend"
 
   result-app:
     image: tomverelst/result-app
-    volumes:
-      - ./result-app:/app
     ports:
       - "5001:80"
-    #links:
-    #  - db
     networks:
       - front-tier
       - back-tier
     restart: always
     environment:
-      - "constraint:node==mh-node2-vb"
+      - "constraint:type==frontend"
 
   worker:
-    container_name: worker
     image: tomverelst/worker
-    #links:
-    #  - db
-    #  - redis
     networks:
       - back-tier
     restart: always
-    #environment:
-    #  - "constraint:node==mh-node1-vb"
+    environment:
+      - "constraint:type==backend"
 
   redis:
-    container_name: redis
     image: redis
     ports: ["6379"]
     networks:
       - back-tier
     restart: always
-    #environment:
-    #  - "constraint:node==mh-node1-vb"
+    environment:
+      - "constraint:type==backend"
 
   db:
-    container_name: db
     image: postgres:9.4
     volumes:
       - "db-data:/var/lib/postgresql/data"
     networks:
       - back-tier
     restart: always
-    #environment:
-    #  - "constraint:node==mh-node1-vb"
+    environment:
+      - "constraint:type==backend"
+      - "constraint:storage==ssd"
 
 volumes:
   db-data:
