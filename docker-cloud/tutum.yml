@@ -1,0 +1,25 @@
+db:
+  image: 'postgres:9.4'
+  volumes:
+    - /var/lib/postgresql/data
+redis:
+  image: 'redis:latest'
+  ports:
+    - '6379'
+result-app:
+  image: 'tomverelst/result-app:latest'
+  links:
+    - db
+  ports:
+    - '5001:80'
+voting-app:
+  image: 'tomverelst/voting-app:latest'
+  links:
+    - redis
+  ports:
+    - '5000:80'
+worker:
+  image: 'tomverelst/worker:latest'
+  links:
+    - db
+    - redis
