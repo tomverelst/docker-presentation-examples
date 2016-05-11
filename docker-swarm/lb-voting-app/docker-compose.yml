@@ -1,0 +1,93 @@
+version: "2"
+
+services:
+  voting-app-lb:
+    image: tomverelst/lb-template:1.1
+    container_name: voting-app-lb
+    ports:
+      - "80:80"
+    depends_on:
+      - voting-app
+    networks:
+      - front-tier
+    environment:
+      - "constraint:node==mh-node1-vb"
+      - APP_NAME=voting-app
+      - APP_PORT=80
+      - CONSUL_URL=${KV_IP}:8500
+
+  voting-app:
+    image: tomverelst/voting-app
+    ports:
+      - "80"
+    networks:
+      - front-tier
+      - back-tier
+    restart: always
+    environment:
+      - "constraint:type==frontend"
+
+  result-app-lb:
+    image: tomverelst/lb-template:1.1
+    container_name: result-app-lb
+    ports:
+      - "80:80"
+    depends_on:
+      - result-app
+    networks:
+      - front-tier
+    environment:
+      - "constraint:node==mh-node2-vb"
+      - APP_NAME=result-app
+      - APP_PORT=80
+      - CONSUL_URL=${KV_IP}:8500
+
+  result-app:
+    image: tomverelst/result-app
+    ports:
+      - "80"
+    networks:
+      - front-tier
+      - back-tier
+    restart: always
+    environment:
+      - "constraint:type==frontend"
+
+  worker:
+    image: tomverelst/worker
+    networks:
+      - back-tier
+    restart: always
+    environment:
+      - "constraint:type==backend"
+
+  redis:
+    image: redis
+    ports: ["6379"]
+    networks:
+      - back-tier
+    restart: always
+    environment:
+      - "constraint:type==backend"
+
+  db:
+    image: postgres:9.4
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+    networks:
+      - back-tier
+    restart: always
+    environment:
+      - "constraint:type==backend"
+      - "constraint:storage==ssd"
+
+volumes:
+  db-data:
+
+networks:
+  front-tier:
+    external:
+      name: front-tier
+  back-tier:
+    external:
+      name: back-tier

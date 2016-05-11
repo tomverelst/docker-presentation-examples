@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Stop all machines
-docker-machine stop mh-node3-vb mh-node2-vb mh-node1-vb mh-kv-vb
+docker-machine stop $(docker-machine ls -q | grep mh)
 
 # Remove all machines
-docker-machine rm mh-node3-vb mh-node2-vb mh-node1-vb mh-kv-vb
+docker-machine rm $(docker-machine ls -q | grep mh)
 
 # Remove network
 docker network rm front-tier back-tier

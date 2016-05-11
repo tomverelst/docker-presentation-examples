@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run -d -l 'com.docker.swarm.reschedule-policy=["on-node-failure"]' nginx

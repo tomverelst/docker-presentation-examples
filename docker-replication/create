@@ -1,0 +1,12 @@
+#!/bin/bash
+
+docker-machine create -d virtualbox master1
+docker-machine create -d virtualbox master2
+
+MASTER_1_IP=$(docker-machine ip master1)
+MASTER_2_IP=$(docker-machine ip master2)
+KV_IP=$(docker-machine ip mh-kv-vb)
+
+
+echo "swarm manage -H :4000 <tls-config-flags> --replication --advertise $MASTER_1_IP:4000 consul://$KV_IP:8500/nodes"
+echo "swarm manage -H :4000 <tls-config-flags> --replication --advertise $MASTER_2_IP:4000 consul://$KV_IP:8500/nodes"
